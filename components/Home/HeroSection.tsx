@@ -24,7 +24,7 @@ const HeroSection = () => {
             </p>
 
             {/* Buttons */}
-            <div className="flex items-center gap-6 mt-8">
+            <div className="flex flex-col md:flex-row items-center gap-6 mt-8">
                 <button className="bg-primary text-white text-base flex items-center gap-2 px-6 py-3 rounded-xl shadow-md border border-white/10 cursor-pointer hover:bg-primary/80 transition-colors">
                     Start Tracking
                     <ArrowRight className="size-4"/>
