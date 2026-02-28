@@ -8,8 +8,13 @@ import { Eye, Mail } from "lucide-react"
 import Link from "next/link"
 import { Button } from "./ui/button"
 import Image from "next/image"
+import { useAuth } from "@/contexts/authContext"
+import { toast } from "sonner"
+import { useRouter } from "next/navigation"
 
 const SignInForm = () => {
+    const {signIn , isLoading} = useAuth();
+    const router = useRouter();
     const form = useForm<SignInSchema>({
         resolver: zodResolver(signInSchema),
         defaultValues:{
@@ -17,8 +22,20 @@ const SignInForm = () => {
             password: ""
         }
     })
+
+    async function onSubmit(data:SignInSchema){
+        try {
+            await signIn(data.email,data.password)
+            toast.success("Login Success!");
+            router.push('/')
+        } catch (error) {
+            toast.error("Login Failed Please Try Again Later!")
+            console.error(error)
+        }
+    }
+
     return (
-        <form className="space-y-8">
+        <form className="space-y-8" onSubmit={form.handleSubmit(onSubmit)}>
             {/* Email */}
             <Controller 
                 name="email"
@@ -79,8 +96,11 @@ const SignInForm = () => {
             </div>
 
             {/* Submit Button */}
-            <Button className="bg-primary w-full py-6 rounded-full cursor-pointer shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 transition-all duration-300">
-                Sign In
+            <Button
+            type="submit"
+            disabled={isLoading}
+            className="bg-primary w-full py-6 rounded-full cursor-pointer shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 transition-all duration-300">
+                {isLoading ? "Signing In...." : "Sign In"}
             </Button>
 
             {/* Divider */}

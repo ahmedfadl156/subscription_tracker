@@ -5,6 +5,8 @@ import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
 import { Button } from "../ui/button"
 import { useAuth } from "@/contexts/authContext"
+import { toast } from "sonner"
+import { useRouter } from "next/navigation"
 
 const NavLink = ({ href, label, onClick }: { href: string; label: string; onClick?: () => void }) => (
     <Link
@@ -28,7 +30,8 @@ const Avatar = ({ name }: { name?: String }) => {
 }
 
 const Navbar = () => {
-    const { user, isLoading } = useAuth()
+    const { user, isLoading , signOut } = useAuth()
+    const router = useRouter();
     const [dropdownOpen, setDropdownOpen] = useState(false)
     const [mobileOpen, setMobileOpen] = useState(false)
     const dropdownRef = useRef<HTMLDivElement>(null)
@@ -50,10 +53,21 @@ const Navbar = () => {
     }, [])
 
     const navLinks = [
-        { href: "#features", label: "Features" },
-        { href: "#how-it-works", label: "How it Works" },
-        { href: "#about", label: "About" },
+        { href: "/#features", label: "Features" },
+        { href: "/#how-it-works", label: "How it Works" },
+        { href: "/#about", label: "About" },
     ]
+
+    const handleLogout = async () => {
+        try {
+            await signOut()
+            toast.success("Sign Out Success!")
+            router.push('/')
+        } catch (error) {
+            toast.error("Sign Out Failed Please Try Again Later!")
+            console.error(error)
+        }
+    }
 
     return (
         <nav className="bg-[#0B0F19]/80 border-b border-white/5 backdrop-blur-md shadow-md w-full px-6 md:px-16 py-4 relative z-50">
@@ -126,7 +140,7 @@ const Navbar = () => {
 
                                 <div className="border-t border-white/10 py-2">
                                     <button
-                                        onClick={() => { setDropdownOpen(false);  }}
+                                        onClick={() => { setDropdownOpen(false); handleLogout() }}
                                         className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors duration-150"
                                     >
                                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
@@ -200,7 +214,7 @@ const Navbar = () => {
                                     Dashboard
                                 </Link>
                                 <button
-                                    onClick={() => { setMobileOpen(false); /* call signOut here */ }}
+                                    onClick={() => { setMobileOpen(false); handleLogout() }}
                                     className="flex items-center gap-2 text-sm text-red-400 hover:text-red-300 py-2 transition-colors"
                                 >
                                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
