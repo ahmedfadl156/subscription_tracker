@@ -26,6 +26,7 @@ interface UpcomingRenewal {
 interface SpendingDetails {
     status: string
     totalSubscriptions: number
+    activeSubscriptions: number
     totalCost: number
     upcomingCount: number
     upcomingRenewals: UpcomingRenewal[]
@@ -69,7 +70,7 @@ const DashboardPage = () => {
 
     return (
         <div className="space-y-8">
-            {/* ── Page Header ── */}
+            {/* Page Header  */}
             <div className="flex items-end justify-between">
                 <div>
                     <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">Overview</h1>
@@ -80,7 +81,7 @@ const DashboardPage = () => {
                 </span>
             </div>
 
-            {/* ── KPI Cards ── */}
+            {/* Cards  */}
             <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                 <AnalyticsCard
                     title="Monthly Spending"
@@ -94,7 +95,7 @@ const DashboardPage = () => {
                 />
                 <AnalyticsCard
                     title="Active Subscriptions"
-                    value={spendingDetails?.totalSubscriptions ?? 0}
+                    value={spendingDetails?.activeSubscriptions ?? 0}
                     icon={CreditCard}
                     iconColor="#22D3EE"
                     iconBg="rgba(34,211,238,0.12)"
@@ -112,7 +113,7 @@ const DashboardPage = () => {
                 />
             </section>
 
-            {/* ── Main Content: Charts + Renewals ── */}
+            {/*  Main Content: Charts + Renewals  */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
                 <div className="col-span-2 flex flex-col gap-4">
                     {/* Left col — charts */}
