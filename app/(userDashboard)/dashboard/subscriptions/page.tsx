@@ -1,9 +1,56 @@
+"use client"
+import SubscriptionSearch from "@/components/subscriptions/SubscriptionSearch"
 import SubscriptionsTable from "@/components/subscriptions/SubscriptionsTable"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import Link from "next/link"
+import { useEffect, useMemo, useState } from "react"
+import { getUserSubscriptions } from "@/services/subscriptions"
+
+type Frequency = "monthly" | "yearly" | "weekly" | "daily"
+type Status = "active" | "expired" | "cancelled" | "trial"
+
+interface Subscription {
+    _id: string
+    name: string
+    category: string
+    price: number
+    currency: string
+    frequency: Frequency
+    status: Status
+    sharedWith: string[]
+    renewalDate: string
+    startDate: string
+    paymentMethod: string
+    costPerPerson: number
+    user: string
+}
 
 const page = () => {
+    const [subscriptions, setSubscriptions] = useState<Subscription[]>([])
+    const [query , setQuery] = useState("");
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState<string | null>(null)
+
+    const filtered = useMemo(() => 
+        subscriptions.filter(s => s.name.toLowerCase().includes(query.toLowerCase())),
+        [subscriptions , query])
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const data = await getUserSubscriptions()
+                setSubscriptions(data.data ?? [])
+            } catch (err) {
+                console.error(err)
+                setError("Failed to load subscriptions")
+            } finally {
+                setLoading(false)
+            }
+        }
+        fetchData()
+    }, [])
+    
     return (
         <div className="space-y-6">
             {/* Header */}
@@ -21,10 +68,10 @@ const page = () => {
             </div>
 
             {/* SUbscriptions Search */}
-            <p className="text-white text-center py-16">Search Will Be Here</p>
+            <SubscriptionSearch onSearch={setQuery}/>
 
             {/* Subscription Table */}
-            <SubscriptionsTable />
+            <SubscriptionsTable subscriptions={filtered} loading={loading} error={error} />
         </div>
     )
 }

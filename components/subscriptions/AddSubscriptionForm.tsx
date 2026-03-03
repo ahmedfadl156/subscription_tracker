@@ -20,6 +20,7 @@ import {
 import { toast } from "sonner"
 import { addSubscription } from "@/services/subscriptions"
 import { useRouter } from "next/navigation"
+import { POPULAR_SERVICES } from "@/lib/popularServices"
 
 const CATEGORIES = [
     "entertainment",
@@ -169,6 +170,16 @@ const AddSubscriptionForm = () => {
                                         aria-invalid={fieldState.invalid}
                                         style={{ backgroundColor: "#1C1C2E", color: "#CBD5E1", borderColor: "rgba(255,255,255,0.1)" }}
                                         className="pl-9 placeholder:text-[#94A3B8]"
+                                        onChange={(e) => {
+                                            field.onChange(e);
+                                            const key = e.target.value.trim().toLowerCase();
+                                            const match = POPULAR_SERVICES[key];
+                                            if (match) {
+                                                form.setValue("cancelUrl", match, { shouldValidate: true });
+                                            } else if (!key) {
+                                                form.setValue("cancelUrl", "");
+                                            }
+                                        }}
                                     />
                                 </div>
                                 {fieldState.invalid && (
@@ -307,7 +318,7 @@ const AddSubscriptionForm = () => {
                         render={({ field, fieldState }) => (
                             <Field data-invalid={fieldState.invalid}>
                                 <FieldLabel htmlFor={field.name} style={{ color: "#CBD5E1" }}>
-                                    Billing Frequency
+                                    Billing Cycle
                                     <span className="text-destructive ml-0.5">*</span>
                                 </FieldLabel>
                                 <div className="relative">

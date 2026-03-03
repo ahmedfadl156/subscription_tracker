@@ -56,26 +56,7 @@ const categoryHex: Record<string, string> = {
     other: "#A78BFA",
 }
 
-const SubscriptionsTable = () => {
-    const [subscriptions, setSubscriptions] = useState<Subscription[]>([])
-    const [loading, setLoading] = useState(true)
-    const [error, setError] = useState<string | null>(null)
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const data = await getUserSubscriptions()
-                setSubscriptions(data.data ?? [])
-            } catch (err) {
-                console.error(err)
-                setError("Failed to load subscriptions")
-            } finally {
-                setLoading(false)
-            }
-        }
-        fetchData()
-    }, [])
-
+const SubscriptionsTable = ({subscriptions, loading, error}: {subscriptions: Subscription[], loading: boolean, error: string | null}) => {
     return (
         <div className="[&_.bg-brand-solid]:bg-white/20! [&_.ring-bg-brand-solid]:ring-white/10!">
             <TableCard.Root className="border border-white/5 bg-[#111827] rounded-2xl overflow-hidden shadow-none ring-0 [&_tr:hover]:bg-white/5! [&_.selected\:bg-secondary]:bg-white/5!">
@@ -212,7 +193,7 @@ const SubscriptionsTable = () => {
 
                                     {/* Actions */}
                                     <Table.Cell>
-                                        <TableRowActionsDropdown />
+                                        <TableRowActionsDropdown isExpired={sub.status === "expired"} />
                                     </Table.Cell>
 
                                 </Table.Row>

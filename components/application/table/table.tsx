@@ -27,21 +27,20 @@ import { Dropdown } from "@/components/base/dropdown/dropdown";
 import { Tooltip, TooltipTrigger } from "@/components/base/tooltip/tooltip";
 import { cx } from "@/lib/utils/cx";
 
-export const TableRowActionsDropdown = () => (
+export const TableRowActionsDropdown = ({ isExpired }: { isExpired: boolean }) => (
     <Dropdown.Root>
         <Dropdown.DotsButton />
-
         <Dropdown.Popover className="w-min">
             <Dropdown.Menu>
-                <Dropdown.Item icon={Edit01}>
-                    <span className="pr-4">Edit</span>
-                </Dropdown.Item>
-                <Dropdown.Item icon={Copy01}>
-                    <span className="pr-4">Copy link</span>
-                </Dropdown.Item>
-                <Dropdown.Item icon={Trash01}>
-                    <span className="pr-4">Delete</span>
-                </Dropdown.Item>
+                {isExpired ? (
+                    <Dropdown.Item icon={Edit01}>
+                        <span className="pr-4">Renew</span>
+                    </Dropdown.Item>
+                ) : (
+                    <Dropdown.Item icon={Trash01}>
+                        <span className="pr-4">Cancel</span>
+                    </Dropdown.Item>
+                )}
             </Dropdown.Menu>
         </Dropdown.Popover>
     </Dropdown.Root>
