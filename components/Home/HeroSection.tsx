@@ -30,7 +30,7 @@ const HeroSection = () => {
                 {/* CTA Buttons */}
                 <div className="flex flex-col sm:flex-row items-center gap-4 mt-8 w-full sm:w-auto">
                     <Link
-                        href="/sign-up"
+                        href="/dashboard"
                         className="w-full sm:w-auto bg-primary text-white text-sm sm:text-base font-medium flex items-center justify-center gap-2 px-7 py-3 rounded-xl shadow-lg border border-white/10 cursor-pointer hover:bg-primary/80 transition-all duration-200 hover:shadow-primary/30 hover:shadow-xl"
                     >
                         Start Tracking Free

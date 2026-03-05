@@ -1,8 +1,8 @@
 "use client";
-import { useEffect, useState } from "react"
+import { useQuery } from "@tanstack/react-query"
 import { getSpendingDetails } from "@/services/subscriptions"
 import AnalyticsCard from "@/components/Dashboard/AnalyticsCard"
-import { DollarSign, CreditCard, CalendarClock, ArrowRight, TrendingUp } from "lucide-react"
+import { DollarSign, CreditCard, CalendarClock, ArrowRight } from "lucide-react"
 import SpendingStatistics from "@/components/Dashboard/SpendingStatistics";
 import QuickStatsCard from "@/components/Dashboard/QuickStatsCard";
 import { CategoryBreakdown } from "@/components/Dashboard/CategoryBreakdown";
@@ -51,22 +51,10 @@ function daysUntil(dateStr: string): number {
 }
 
 const DashboardPage = () => {
-    const [spendingDetails, setSpendingDetails] = useState<SpendingDetails | null>(null)
-    const [loading, setLoading] = useState(true)
-
-    useEffect(() => {
-        const fetchSpendingDetails = async () => {
-            try {
-                const data = await getSpendingDetails()
-                setSpendingDetails(data)
-            } catch (error) {
-                console.error("Error fetching spending details:", error)
-            } finally {
-                setLoading(false)
-            }
-        }
-        fetchSpendingDetails()
-    }, [])
+    const { data: spendingDetails, isLoading: loading } = useQuery({
+        queryKey: ['spending-details'],
+        queryFn: getSpendingDetails,
+    })
 
     return (
         <div className="space-y-8">
@@ -165,7 +153,7 @@ const DashboardPage = () => {
                             </div>
                         ) : spendingDetails?.upcomingRenewals?.length ? (
                             <div className="space-y-2">
-                                {spendingDetails.upcomingRenewals.map((renewal, i) => {
+                                {spendingDetails.upcomingRenewals.map((renewal: UpcomingRenewal, i: number) => {
                                     const colors = categoryColors[renewal.category?.toLowerCase() ?? ""] ?? defaultColor
                                     const days = renewal.renewalDate ? daysUntil(renewal.renewalDate) : null
                                     const isUrgent = days !== null && days <= 2

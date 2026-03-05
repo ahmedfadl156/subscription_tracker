@@ -3,9 +3,9 @@
 import { createSubscritionSchema, CreateSubscritionSchema } from "@/lib/Schemas"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Controller, useForm } from "react-hook-form"
-import { Field, FieldLabel, FieldError, FieldGroup } from "../ui/field"
-import { Input } from "../ui/input"
-import { Button } from "../ui/button"
+import { Field, FieldLabel, FieldError, FieldGroup } from "../../ui/field"
+import { Input } from "../../ui/input"
+import { Button } from "../../ui/button"
 import {
     Calendar,
     CreditCard,
@@ -21,6 +21,7 @@ import { toast } from "sonner"
 import { addSubscription } from "@/services/subscriptions"
 import { useRouter } from "next/navigation"
 import { POPULAR_SERVICES } from "@/lib/popularServices"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 const CATEGORIES = [
     "entertainment",
@@ -109,6 +110,8 @@ function StyledSelect({
 
 const AddSubscriptionForm = () => {
     const router = useRouter();
+    const queryClient = useQueryClient();
+
     const form = useForm<CreateSubscritionSchema>({
         resolver: zodResolver(createSubscritionSchema),
         defaultValues: {
@@ -124,16 +127,23 @@ const AddSubscriptionForm = () => {
         },
     })
 
-    async function onSubmit(data: CreateSubscritionSchema) {
-        try {
-            await addSubscription(data);
+    const { mutate: submitSubscription, isPending } = useMutation({
+        mutationFn: addSubscription,
+        onSuccess: () => {
             toast.success("Subscription Added Successfully")
+            queryClient.invalidateQueries({ queryKey: ['subscriptions-data'] })
+            queryClient.invalidateQueries({ queryKey: ['spending-details'] })
             form.reset();
             router.push('/dashboard/subscriptions');
-        } catch (error) {
+        },
+        onError: (error) => {
             console.error(error)
-            toast.error("Failed To Create Post")
-        }
+            toast.error("Failed To Add Subscription")
+        },
+    })
+
+    function onSubmit(data: CreateSubscritionSchema) {
+        submitSubscription(data);
     }
 
     return (
@@ -175,7 +185,7 @@ const AddSubscriptionForm = () => {
                                             const key = e.target.value.trim().toLowerCase();
                                             const match = POPULAR_SERVICES[key];
                                             if (match) {
-                                                form.setValue("cancelUrl", match, { shouldValidate: true });
+                                                form.setValue("cancelUrl", match.cancelUrl, { shouldValidate: true });
                                             } else if (!key) {
                                                 form.setValue("cancelUrl", "");
                                             }
@@ -495,36 +505,31 @@ const AddSubscriptionForm = () => {
             </div>
 
             {/*  Actions  */}
-            {(() => {
-                const { isSubmitting } = form.formState
-                return (
-                    <div className="flex items-center justify-end gap-3 pt-1">
-                        <Button
-                            type="button"
-                            variant="outline"
-                            size="lg"
-                            disabled={isSubmitting}
-                        >
-                            Cancel
-                        </Button>
-                        <Button
-                            type="submit"
-                            size="lg"
-                            disabled={isSubmitting}
-                            className="bg-primary hover:bg-primary/90 text-primary-foreground min-w-[160px] shadow-md shadow-primary/25 transition-all"
-                        >
-                            {isSubmitting ? (
-                                <>
-                                    <Loader2 className="size-4 animate-spin" />
-                                    Adding…
-                                </>
-                            ) : (
-                                "Add Subscription"
-                            )}
-                        </Button>
-                    </div>
-                )
-            })()}
+            <div className="flex items-center justify-end gap-3 pt-1">
+                <Button
+                    type="button"
+                    variant="outline"
+                    size="lg"
+                    disabled={isPending}
+                >
+                    Cancel
+                </Button>
+                <Button
+                    type="submit"
+                    size="lg"
+                    disabled={isPending}
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground min-w-[160px] shadow-md shadow-primary/25 transition-all"
+                >
+                    {isPending ? (
+                        <>
+                            <Loader2 className="size-4 animate-spin" />
+                            Adding…
+                        </>
+                    ) : (
+                        "Add Subscription"
+                    )}
+                </Button>
+            </div>
         </form>
     )
 }

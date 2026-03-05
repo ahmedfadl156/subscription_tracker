@@ -57,7 +57,6 @@ const categoryHex: Record<string, string> = {
     other: "#A78BFA",
 }
 
-// ── Service logo with letter-initial fallback ──────────────────────────────
 const ServiceLogo = ({ name, category }: { name: string; category: string }) => {
     const logoUrl = getServiceLogo(name);
     const color = categoryHex[category.toLowerCase()] ?? "#6B7280";
@@ -82,7 +81,6 @@ const ServiceLogo = ({ name, category }: { name: string; category: string }) => 
         );
     }
 
-    // Fallback — letter initial
     return (
         <div
             className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center shrink-0 text-sm font-bold uppercase"

@@ -47,8 +47,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
     }
 
-    const signIn = async (email: String, password: String) => {
+    const signIn = async (email: string, password: string) => {
         try {
+            setIsLoading(true)
             const res = await fetch(`${API_URL}/auth/sign-in`, {
                 method: "POST",
                 headers: {
@@ -57,7 +58,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 credentials: "include",
                 body: JSON.stringify({ email, password })
             })
-            setIsLoading(true)
             if (res.ok) {
                 await checkAuth();
             } else {
@@ -65,9 +65,33 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 throw new Error(errorData.message || "Login Failed Please Try Again!")
             }
         } catch (error) {
-            setIsLoading(false)
             console.error("Login Failed", error)
             throw error
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    const signUp = async (name: string, email: string, password: string) => {
+        try {
+            setIsLoading(true);
+            const res = await fetch(`${API_URL}/auth/sign-up`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                credentials: "include",
+                body: JSON.stringify({ name, email, password })
+            })
+            if (res.ok) {
+                await checkAuth();
+            } else {
+                const errorData = await res.json();
+                throw new Error(errorData.message || "Sign Up Failed Please Try Again!")
+            }
+        } catch (error) {
+            console.error("Failed To Create Account", error)
+            throw error;
         } finally {
             setIsLoading(false)
         }
@@ -98,6 +122,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             isLoading,
             isAuthenticated: !!user,
             signIn,
+            signUp,
             signOut
         }}>
             {children}

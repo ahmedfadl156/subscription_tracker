@@ -1,5 +1,5 @@
 "use client"
-import AddSubscriptionForm from "@/components/subscriptions/AddSubscriptionForm"
+import AddSubscriptionForm from "@/components/Dashboard/subscriptions/AddSubscriptionForm"
 import { ArrowLeft, BadgePlus } from "lucide-react"
 import Link from "next/link"
 

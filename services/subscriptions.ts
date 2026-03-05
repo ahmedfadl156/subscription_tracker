@@ -50,10 +50,45 @@ export const addSubscription = async (data: CreateSubscritionSchema) => {
         if (!res.ok) {
             throw new Error("Failed To Add Subscription")
         }
-        const post = await res.json();
-        return post;
+        const sub = await res.json();
+        return sub;
     } catch (error) {
         console.error("Erro While Creating The Susbcription" + error);
         throw new Error("Failed To Add Your Subscription Please Try Again!")
+    }
+}
+
+export const deleteUserSubscription = async (id: String) => {
+    try {
+        const res = await fetch(`${API_URL}/subscriptions/${id}`, {
+            method: "DELETE",
+            credentials: "include"
+        });
+
+        if (!res.ok) {
+            throw new Error("Failed To Delete Subscription");
+        }
+
+        const sub = await res.json();
+        return sub;
+    } catch (error) {
+        console.error("Error While Deleting Subscription" + error);
+        throw new Error("Failed To Delete Your Subscription Please Try Again Later!");
+    }
+}
+
+export const getSubscriptionById = async (id: string) => {
+    try {
+        const res = await fetch(`${API_URL}/subscriptions/${id}`, {
+            credentials: "include",
+        });
+        if (!res.ok) {
+            throw new Error("Failed To Fetch Subscription");
+        }
+        const data = await res.json();
+        return data;
+    } catch (error) {
+        console.error("Error While Fetching Subscription: " + error);
+        throw new Error("Failed To Fetch Subscription Details");
     }
 }

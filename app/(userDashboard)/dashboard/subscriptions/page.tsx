@@ -1,11 +1,12 @@
 "use client"
-import SubscriptionSearch from "@/components/subscriptions/SubscriptionSearch"
-import SubscriptionsTable from "@/components/subscriptions/SubscriptionsTable"
+import SubscriptionSearch from "@/components/Dashboard/subscriptions/SubscriptionSearch"
+import SubscriptionsTable from "@/components/Dashboard/subscriptions/SubscriptionsTable"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useMemo, useState } from "react"
 import { getUserSubscriptions } from "@/services/subscriptions"
+import { useQuery } from "@tanstack/react-query"
 
 type Frequency = "monthly" | "yearly" | "weekly" | "daily"
 type Status = "active" | "expired" | "cancelled" | "trial"
@@ -27,30 +28,18 @@ interface Subscription {
 }
 
 const page = () => {
-    const [subscriptions, setSubscriptions] = useState<Subscription[]>([])
-    const [query , setQuery] = useState("");
-    const [loading, setLoading] = useState(true)
-    const [error, setError] = useState<string | null>(null)
-
-    const filtered = useMemo(() => 
-        subscriptions.filter(s => s.name.toLowerCase().includes(query.toLowerCase())),
-        [subscriptions , query])
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const data = await getUserSubscriptions()
-                setSubscriptions(data.data ?? [])
-            } catch (err) {
-                console.error(err)
-                setError("Failed to load subscriptions")
-            } finally {
-                setLoading(false)
-            }
+    const { data: subscriptions, isLoading, isError } = useQuery({
+        queryKey: ['subscriptions-data'],
+        queryFn: async () => {
+            const res = await getUserSubscriptions();
+            return res?.data;
         }
-        fetchData()
-    }, [])
-    
+    })
+    const [query, setQuery] = useState("");
+    const filtered = useMemo(() =>
+        (subscriptions ?? []).filter(s => s.name.toLowerCase().includes(query.toLowerCase())),
+        [subscriptions, query])
+
     return (
         <div className="space-y-6">
             {/* Header */}
@@ -60,18 +49,18 @@ const page = () => {
                     <p className="text-[#94A3B8] text-sm mt-2">Manage your recurring payments and optimize spending</p>
                 </div>
                 <Link href="subscriptions/add">
-                <Button className="cursor-pointer rounded-full py-6 px-8 hover:shadow-md shadow-primary hover:backdrop-blur-2xl hover:-translate-y-1 transition-all duration-300">
-                    <Plus className="size-4" />
-                    Add Subscription
-                </Button>
+                    <Button className="cursor-pointer rounded-full py-6 px-8 hover:shadow-md shadow-primary hover:backdrop-blur-2xl hover:-translate-y-1 transition-all duration-300">
+                        <Plus className="size-4" />
+                        Add Subscription
+                    </Button>
                 </Link>
             </div>
 
             {/* SUbscriptions Search */}
-            <SubscriptionSearch onSearch={setQuery}/>
+            <SubscriptionSearch onSearch={setQuery} />
 
             {/* Subscription Table */}
-            <SubscriptionsTable subscriptions={filtered} loading={loading} error={error} />
+            <SubscriptionsTable subscriptions={filtered} loading={isLoading} error={isError ? "Something went wrong. Please try again." : null} />
         </div>
     )
 }
