@@ -45,11 +45,11 @@ const page = () => {
             {/* Header */}
             <div className="flex flex-col items-center justify-center md:flex-row md:justify-between">
                 <div className="flex flex-col items-center md:items-start">
-                    <h1 className="text-2xl md:text-3xl lg:text-4xl text-white font-bold">Subscriptions</h1>
-                    <p className="text-[#94A3B8] text-sm mt-2">Manage your recurring payments and optimize spending</p>
+                    <h1 className="text-2xl md:text-3xl lg:text-4xl text-white font-bold mt-4 md:mt-0">Subscriptions</h1>
+                    <p className="text-[#94A3B8] text-sm text-center md:text-left mt-2">Manage your recurring payments and optimize spending</p>
                 </div>
                 <Link href="subscriptions/add">
-                    <Button className="cursor-pointer rounded-full py-6 px-8 hover:shadow-md shadow-primary hover:backdrop-blur-2xl hover:-translate-y-1 transition-all duration-300">
+                    <Button className="cursor-pointer my-6 md:mt-0 rounded-full py-6 px-8 hover:shadow-md shadow-primary hover:backdrop-blur-2xl hover:-translate-y-1 transition-all duration-300">
                         <Plus className="size-4" />
                         Add Subscription
                     </Button>
