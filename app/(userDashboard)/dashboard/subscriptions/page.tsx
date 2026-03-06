@@ -37,7 +37,7 @@ const page = () => {
     })
     const [query, setQuery] = useState("");
     const filtered = useMemo(() =>
-        (subscriptions ?? []).filter(s => s.name.toLowerCase().includes(query.toLowerCase())),
+        (subscriptions as Subscription[] ?? []).filter((s: Subscription) => s.name.toLowerCase().includes(query.toLowerCase())),
         [subscriptions, query])
 
     return (
