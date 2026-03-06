@@ -25,6 +25,7 @@ interface Subscription {
     paymentMethod: string
     costPerPerson: number
     user: string
+    cancelUrl?: string
 }
 
 const page = () => {

@@ -22,6 +22,7 @@ interface Subscription {
     paymentMethod: string
     costPerPerson: number
     user: string
+    cancelUrl?: string
 }
 
 const statusStyles: Record<Status, { dot: string; text: string; bg: string; ring: string }> = {

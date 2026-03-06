@@ -55,7 +55,7 @@ const CustomLegend = () => (
 );
 
 const SpendingTrends = () => {
-    const {data: analytics , isLoading , isError , isFetching} = useQuery({
+    const { data: analytics, isLoading, isError, isFetching } = useQuery({
         queryKey: ['analytics-data'],
         queryFn: async () => {
             const res = await getSpendingTrends();
@@ -64,12 +64,12 @@ const SpendingTrends = () => {
     })
 
 
-    const chartData = analytics?.map((d) => ({
+    const chartData = (analytics as TrendDataPoint[] | undefined)?.map((d: TrendDataPoint) => ({
         ...d,
         label: `${d.month} '${String(d.year).slice(2)}`,
     }));
 
-    if(isError){
+    if (isError) {
         return (
             <div className="flex items-center justify-center h-64 text-white/30 text-sm">
                 Error Loading Data!
