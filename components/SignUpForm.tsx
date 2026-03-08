@@ -28,7 +28,7 @@ const SignUpForm = () => {
         try {
             await signUp(data.name, data.email, data.password)
             toast.success("Account Created Successfully!")
-            router.push('/')
+            router.push('/dashboard')
         } catch (error) {
             toast.error("Sign Up Failed Please Try Again Later!")
             console.error(error)
@@ -131,13 +131,13 @@ const SignUpForm = () => {
 
             {/* OAuth Sign In */}
             <div className="flex items-center justify-center gap-4">
-                <a href="http://localhost:5500/api/v1/auth/google">
+                <a href="/api/v1/auth/google">
                     <Button type="button" className="bg-[#1C1C2E] text-white text-base cursor-pointer border border-[#334155] px-8 outline-none py-[22px] hover:bg-[#1C1C2E]/80">
                         <Image src="/icons/Google.png" alt="Google" width={24} height={24} />
                         Google
                     </Button>
                 </a>
-                <Link href="http://localhost:5500/api/v1/auth/github">
+                <Link href="/api/v1/auth/github">
                     <Button type="button" className="bg-[#1C1C2E] text-white text-base cursor-pointer border border-[#334155] px-8 outline-none py-[22px] hover:bg-[#1C1C2E]/80">
                         <Image src="/icons/github.png" alt="Github" width={24} height={24} />
                         Github
