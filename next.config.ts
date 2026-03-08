@@ -22,7 +22,8 @@ const nextConfig: NextConfig = {
         pathname: "/s2/favicons**",
       },
     ]
-  }
+  },
 };
 
 export default nextConfig;
+

@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import Sidebar, { MobileMenuButton } from "@/components/Dashboard/Sidebar"
 import { Bell, Search, CheckCheck, CheckCircle2, AlertTriangle, Info, XCircle, ArrowRight, Loader2 } from "lucide-react"
 import { useAuth } from "@/contexts/authContext"
@@ -171,7 +172,26 @@ const NotificationBell = () => {
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     const [mobileOpen, setMobileOpen] = useState(false)
-    const { user } = useAuth()
+    const { user, isLoading } = useAuth()
+    const router = useRouter()
+
+    useEffect(() => {
+        if (!isLoading && !user) {
+            router.replace('/sign-in')
+        }
+    }, [isLoading, user, router])
+
+    // Show spinner while checking auth
+    if (isLoading) {
+        return (
+            <div className="min-h-screen bg-[#0B0F19] flex items-center justify-center">
+                <Loader2 className="w-8 h-8 text-[#6366F1] animate-spin" />
+            </div>
+        )
+    }
+
+    // Don't render dashboard if not authenticated (redirect is in progress)
+    if (!user) return null
 
     return (
         <div className="min-h-screen bg-[#0B0F19] flex">
