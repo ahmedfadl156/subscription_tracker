@@ -1,7 +1,7 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
-import { getSubscriptionById } from "@/services/subscriptions"
+import { getBillingHistory, getSubscriptionById } from "@/services/subscriptions"
 import { getServiceLogo } from "@/lib/popularServices"
 import Image from "next/image"
 import Link from "next/link"
@@ -19,6 +19,9 @@ import {
     Clock,
     ExternalLink,
     Zap,
+    Receipt,
+    CheckCircle2,
+    TrendingUp,
 } from "lucide-react"
 
 // Types 
@@ -41,6 +44,12 @@ interface Subscription {
     cancelUrl?: string
     createdAt: string
     updatedAt: string
+}
+
+interface BillingHistory {
+    amount: number
+    currency: string
+    date: string
 }
 
 //  Helpers
@@ -165,7 +174,22 @@ const DetailsPageSkeleton = () => (
     </div>
 )
 
-// Page 
+const BillingHistorySkeleton = () => (
+    <div className="space-y-3 animate-pulse px-6 py-4">
+        {[...Array(4)].map((_, i) => (
+            <div key={i} className="flex items-center gap-4 py-2">
+                <div className="w-8 h-8 rounded-full bg-white/10 shrink-0" />
+                <div className="flex-1 space-y-1.5">
+                    <div className="w-32 h-3 rounded bg-white/10" />
+                    <div className="w-20 h-2.5 rounded bg-white/5" />
+                </div>
+                <div className="w-16 h-4 rounded bg-white/10" />
+            </div>
+        ))}
+    </div>
+)
+
+
 const SubscriptionDetailsPage = () => {
     const params = useParams()
     const id = params.id as string
@@ -178,6 +202,16 @@ const SubscriptionDetailsPage = () => {
         },
         enabled: !!id,
     })
+
+    const { data: billingHistory, isLoading: billingHistoryLoading } = useQuery({
+        queryKey: ["billing-history", id],
+        queryFn: async () => {
+            const res = await getBillingHistory(id)
+            return (res?.data ?? res) as BillingHistory[]
+        },
+        enabled: !!id,
+    })
+
 
     if (isLoading) return (
         <div className="max-w-3xl mx-auto px-4 py-8">
@@ -225,7 +259,6 @@ const SubscriptionDetailsPage = () => {
                 className="relative rounded-2xl border border-white/5 overflow-hidden"
                 style={{ background: "linear-gradient(135deg,#0f172a 0%,#111827 100%)" }}
             >
-                {/* Colour glow */}
                 <div
                     className="absolute -top-16 -left-16 w-64 h-64 rounded-full blur-3xl opacity-20 pointer-events-none"
                     style={{ background: color }}
@@ -328,6 +361,130 @@ const SubscriptionDetailsPage = () => {
                     <InfoRow icon={Calendar} label="Start Date" value={fmt(sub.startDate)} accent={color} />
                     <InfoRow icon={Calendar} label="Renewal Date" value={fmt(sub.renewalDate)} accent={color} />
                 </div>
+            </div>
+
+            {/* Billing History */}
+            <div
+                className="rounded-2xl border border-white/5 overflow-hidden"
+                style={{ background: "#111827" }}
+            >
+                {/* Header */}
+                <div className="px-6 py-4 border-b border-white/5 flex flex-col md:flex-row items-center gap-3">
+                    <div
+                        className="w-7 h-7 rounded-lg flex  items-center justify-center"
+                        style={{ background: color + "22" }}
+                    >
+                        <Receipt className="w-3.5 h-3.5" style={{ color }} />
+                    </div>
+                    <h2 className="text-sm font-semibold text-white/60 uppercase tracking-widest">Billing History</h2>
+                    {billingHistory && billingHistory.length > 0 && (
+                        <div className="md:ml-auto flex flex-col md:flex-row items-center gap-3">
+                            <div className="flex items-center gap-1.5 text-xs text-white/30">
+                                <TrendingUp className="w-3 h-3" />
+                                <span>{billingHistory.length} payment{billingHistory.length !== 1 ? "s" : ""}</span>
+                            </div>
+                            <div
+                                className="text-xs font-semibold px-2.5 py-1 rounded-full"
+                                style={{ background: color + "22", color }}
+                            >
+                                {billingHistory[0].currency.toUpperCase()}{" "}
+                                {billingHistory.reduce((sum, b) => sum + b.amount, 0).toFixed(2)} total
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                {/* Body */}
+                {billingHistoryLoading ? (
+                    <BillingHistorySkeleton />
+                ) : !billingHistory || billingHistory.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-12 gap-3">
+                        <div
+                            className="w-12 h-12 rounded-2xl flex items-center justify-center"
+                            style={{ background: color + "15" }}
+                        >
+                            <Receipt className="w-5 h-5" style={{ color, opacity: 0.6 }} />
+                        </div>
+                        <p className="text-sm text-white/25">No billing records yet</p>
+                        <p className="text-xs text-white/15">Payments will appear here once processed</p>
+                    </div>
+                ) : (
+                    <div className="relative">
+                        <ul className="px-6 py-3 space-y-1">
+                            {billingHistory.map((entry, i) => {
+                                const isLatest = i === 0
+                                const entryDate = new Date(entry.paymentDate)
+                                const dateLabel = entryDate.toLocaleDateString("en-US", {
+                                    year: "numeric", month: "short", day: "numeric",
+                                })
+                                const timeLabel = entryDate.toLocaleTimeString("en-US", {
+                                    hour: "2-digit", minute: "2-digit",
+                                })
+                                return (
+                                    <li
+                                        key={i}
+                                        className="relative flex items-center gap-4 py-3"
+                                    >
+                                        {/* Timeline dot */}
+                                        <div className="relative z-10 shrink-0">
+                                            {isLatest ? (
+                                                <div
+                                                    className="w-8 h-8 rounded-full flex items-center justify-center ring-2"
+                                                    style={{
+                                                        background: color + "30",
+                                                        boxShadow: `0 0 0 2px ${color}40`,
+                                                    }}
+                                                >
+                                                    <CheckCircle2 className="w-4 h-4" style={{ color }} />
+                                                </div>
+                                            ) : (
+                                                <div
+                                                    className="w-8 h-8 rounded-full flex items-center justify-center"
+                                                    style={{ background: "#1e2a3a" }}
+                                                >
+                                                    <DollarSign className="w-3.5 h-3.5 text-white/20" />
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Info */}
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-sm font-medium text-white/70">
+                                                {sub.name} Payment
+                                                {isLatest && (
+                                                    <span
+                                                        className="ml-2 text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full"
+                                                        style={{ background: color + "25", color }}
+                                                    >
+                                                        Latest
+                                                    </span>
+                                                )}
+                                            </p>
+                                            <p className="text-xs text-white/25 mt-0.5">
+                                                {dateLabel}{" "}
+                                                <span className="text-white/15">·</span>{" "}
+                                                {timeLabel}
+                                            </p>
+                                        </div>
+
+                                        {/* Amount */}
+                                        <div className="text-right shrink-0">
+                                            <p
+                                                className="text-sm font-bold"
+                                                style={{ color: isLatest ? color : "rgba(255,255,255,0.55)" }}
+                                            >
+                                                {entry.currency.toUpperCase()} {entry.amount.toFixed(2)}
+                                            </p>
+                                            <p className="text-[10px] text-white/20 mt-0.5 uppercase tracking-wider">
+                                                {frequencyLabel[sub.frequency]}
+                                            </p>
+                                        </div>
+                                    </li>
+                                )
+                            })}
+                        </ul>
+                    </div>
+                )}
             </div>
 
             {/*  Shared With  */}

@@ -60,7 +60,7 @@ const AiInsightsCard = () => {
             const res = await getAiInsights();
             return res?.data;
         },
-        staleTime: 1000 * 60 * 60 * 24, // 24h — matches Redis cache
+        staleTime: 1000 * 60 * 60 * 24, 
         retry: 1,
     });
 
@@ -113,7 +113,7 @@ const AiInsightsCard = () => {
                                     Total Potential Annual Savings
                                 </p>
                                 <p className="text-white text-3xl font-bold mt-0.5">
-                                    ${data.totalPotentialSavings.toLocaleString()}
+                                    ${data.totalPotentialSavings}
                                 </p>
                             </div>
                         </div>

@@ -27,9 +27,9 @@ import { Dropdown } from "@/components/base/dropdown/dropdown";
 import { Tooltip, TooltipTrigger } from "@/components/base/tooltip/tooltip";
 import { cx } from "@/lib/utils/cx";
 import { Button } from "@/components/ui/button";
-import { deleteUserSubscription } from "@/services/subscriptions";
+import { deleteUserSubscription, renewSubscription } from "@/services/subscriptions";
 import { toast } from "sonner";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Eye } from "lucide-react";
 import Link from "next/link";
 
@@ -145,6 +145,17 @@ export const TableRowActionsDropdown = ({ isExpired, cancelUrl, subId }: { isExp
         }
     };
 
+    const { mutate: triggerRenew, isPending: isRenewing } = useMutation({
+        mutationFn: () => renewSubscription(subId),
+        onSuccess: () => {
+            toast.success("Subscription renewed successfully");
+            queryClient.invalidateQueries({ queryKey: ['subscriptions-data'] });
+        },
+        onError: () => {
+            toast.error("Failed to renew subscription. Please try again.");
+        },
+    });
+
     return (
         <>
             <DeleteConfirmModal
@@ -159,7 +170,19 @@ export const TableRowActionsDropdown = ({ isExpired, cancelUrl, subId }: { isExp
                     <Dropdown.Menu>
                         {isExpired ? (
                             <Dropdown.Item icon={Edit01}>
-                                <span className="pr-4">Renew</span>
+                                <button
+                                    onClick={() => triggerRenew()}
+                                    disabled={isRenewing}
+                                    className="pr-4 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {isRenewing && (
+                                        <svg className="animate-spin w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                                        </svg>
+                                    )}
+                                    {isRenewing ? "Renewing…" : "Renew"}
+                                </button>
                             </Dropdown.Item>
                         ) : (
                             <Dropdown.Item icon={Trash01}>

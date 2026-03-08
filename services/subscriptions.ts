@@ -92,3 +92,37 @@ export const getSubscriptionById = async (id: string) => {
         throw new Error("Failed To Fetch Subscription Details");
     }
 }
+
+export const getBillingHistory = async (id: string) => {
+    try {
+        const res = await fetch(`${API_URL}/payments/${id}/billing-history`, {
+            credentials: "include",
+        });
+        if (!res.ok) {
+            throw new Error("Failed To Fetch Billing History");
+        }
+        const data = await res.json();
+        return data;
+    } catch (error) {
+        console.error("Error While Fetching Billing History: " + error);
+        throw new Error("Failed To Fetch Billing History Details");
+    }
+}
+
+
+export const renewSubscription = async (id: string) => {
+    try {
+        const res = await fetch(`${API_URL}/subscriptions/${id}/renew`, {
+            method: "PATCH",
+            credentials: "include",
+        });
+        if (!res.ok) {
+            throw new Error("Failed To Renew Subscription");
+        }
+        const data = await res.json();
+        return data;
+    } catch (error) {
+        console.error("Error while renew your subscription" + error)
+        throw new Error("Failed to renew your subscription")
+    }
+}
