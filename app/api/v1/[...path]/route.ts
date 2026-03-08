@@ -21,12 +21,11 @@ async function handler(
 
     const hasBody = req.method !== "GET" && req.method !== "HEAD";
 
-    let body: Buffer | undefined;
+    let body: ArrayBuffer | undefined;
     if (hasBody) {
-        const arrayBuffer = await req.arrayBuffer();
-        body = Buffer.from(arrayBuffer);
-        if (body.length > 0) {
-            headers["content-length"] = String(body.length);
+        body = await req.arrayBuffer();
+        if (body.byteLength > 0) {
+            headers["content-length"] = String(body.byteLength);
         }
     }
 
@@ -35,8 +34,8 @@ async function handler(
         response = await fetch(targetUrl, {
             method: req.method,
             headers,
-            ...(hasBody && body && body.length > 0 ? { body } : {}),
-        });
+            ...(hasBody && body && body.byteLength > 0 ? { body: body as BodyInit } : {}),
+        } as RequestInit);
     } catch (err) {
         console.error("[PROXY] Fetch error:", err);
         return NextResponse.json({ error: "Upstream unreachable" }, { status: 502 });
@@ -69,9 +68,9 @@ async function handler(
     });
 }
 
-export const GET     = handler;
-export const POST    = handler;
-export const PUT     = handler;
-export const PATCH   = handler;
-export const DELETE  = handler;
+export const GET = handler;
+export const POST = handler;
+export const PUT = handler;
+export const PATCH = handler;
+export const DELETE = handler;
 export const OPTIONS = handler; 
