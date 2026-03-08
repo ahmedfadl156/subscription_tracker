@@ -50,6 +50,7 @@ interface BillingHistory {
     amount: number
     currency: string
     date: string
+    paymentDate: Date 
 }
 
 //  Helpers
@@ -413,7 +414,7 @@ const SubscriptionDetailsPage = () => {
                         <ul className="px-6 py-3 space-y-1">
                             {billingHistory.map((entry, i) => {
                                 const isLatest = i === 0
-                                const entryDate = new Date(entry.paymentDate)
+                                const entryDate = new Date(entry?.paymentDate)
                                 const dateLabel = entryDate.toLocaleDateString("en-US", {
                                     year: "numeric", month: "short", day: "numeric",
                                 })
