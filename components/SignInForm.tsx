@@ -27,7 +27,7 @@ const SignInForm = () => {
         try {
             await signIn(data.email, data.password)
             toast.success("Login Success!");
-            router.push('/dashboard')
+            router.push('/')
         } catch (error) {
             toast.error("Login Failed Please Try Again Later!")
             console.error(error)

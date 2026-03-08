@@ -28,7 +28,7 @@ const SignUpForm = () => {
         try {
             await signUp(data.name, data.email, data.password)
             toast.success("Account Created Successfully!")
-            router.push('/dashboard')
+            router.push('/')
         } catch (error) {
             toast.error("Sign Up Failed Please Try Again Later!")
             console.error(error)
